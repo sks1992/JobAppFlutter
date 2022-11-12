@@ -27,11 +27,22 @@ class _SignupScreenState extends State<SignupScreen>
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final _signupFormKey = GlobalKey<FormState>();
-  final FocusNode _passFocusNode = FocusNode();
+
+  final FocusNode _nameFocusNode = FocusNode();
+  final FocusNode _emailFocusNode = FocusNode();
+  final FocusNode _passwordFocusNode = FocusNode();
+  final FocusNode _phoneNumberFocusNode = FocusNode();
+  final FocusNode _companyAddressFocusNode = FocusNode();
+
+  final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _phoneNumberController = TextEditingController();
+  final TextEditingController _companyAddressController =
+      TextEditingController();
+
   bool _obscureText = false;
-  bool isLoading = false;
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -55,9 +66,18 @@ class _SignupScreenState extends State<SignupScreen>
   @override
   void dispose() {
     _emailController.dispose();
+    _nameController.dispose();
     _passwordController.dispose();
+    _phoneNumberController.dispose();
+    _companyAddressController.dispose();
+
     _animationController.dispose();
-    _passFocusNode.dispose();
+
+    _emailFocusNode.dispose();
+    _passwordFocusNode.dispose();
+    _nameFocusNode.dispose();
+    _phoneNumberFocusNode.dispose();
+    _companyAddressFocusNode.dispose();
     super.dispose();
   }
 
@@ -65,7 +85,7 @@ class _SignupScreenState extends State<SignupScreen>
     final isValid = _signupFormKey.currentState!.validate();
     if (isValid) {
       setState(() {
-        isLoading = true;
+        _isLoading = true;
       });
 
       try {
@@ -77,7 +97,7 @@ class _SignupScreenState extends State<SignupScreen>
         Navigator.canPop(context) ? Navigator.pop(context) : null;
       } on FirebaseAuthException catch (error) {
         setState(() {
-          isLoading = false;
+          _isLoading = false;
         });
         GlobalMethod.showErrorDialog(
           error: error.toString(),
@@ -85,8 +105,12 @@ class _SignupScreenState extends State<SignupScreen>
         );
       }
     }
-    setState(() {
-      isLoading = true;
+  }
+
+  void _showImageDialog() async {
+
+    showDialog(context: context, builder: (context){
+      return AlertDialog();
     });
   }
 
@@ -130,7 +154,9 @@ class _SignupScreenState extends State<SignupScreen>
                       child: Column(
                         children: [
                           GestureDetector(
-                            onTap: () {},
+                            onTap: () {
+                              //create showImageDialog
+                            },
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Container(
@@ -149,7 +175,7 @@ class _SignupScreenState extends State<SignupScreen>
                                       ? const Icon(
                                           Icons.camera_alt_sharp,
                                           size: 30,
-                                    color: Colors.grey,
+                                          color: Colors.grey,
                                         )
                                       : Image.file(imageFile!,
                                           fit: BoxFit.fill),
@@ -157,11 +183,41 @@ class _SignupScreenState extends State<SignupScreen>
                               ),
                             ),
                           ),
+                          const SizedBox(
+                            height: 15,
+                          ),
                           TextFormField(
-                            textInputAction: TextInputAction.next,
+                            textInputAction: TextInputAction.done,
                             onEditingComplete: () => FocusScope.of(context)
-                                .requestFocus(_passFocusNode),
-                            keyboardType: TextInputType.text,
+                                .requestFocus(_nameFocusNode),
+                            keyboardType: TextInputType.name,
+                            controller: _nameController,
+                            validator: (value) {
+                              if (value!.isEmpty) {
+                                return "This Field is missing";
+                              }
+                              return null;
+                            },
+                            style: const TextStyle(color: Colors.white),
+                            decoration: const InputDecoration(
+                              labelText: "Name/Company Name",
+                              labelStyle: TextStyle(color: Colors.white),
+                              enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.white)),
+                              focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.green)),
+                              errorBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.red)),
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 15,
+                          ),
+                          TextFormField(
+                            textInputAction: TextInputAction.done,
+                            onEditingComplete: () => FocusScope.of(context)
+                                .requestFocus(_emailFocusNode),
+                            keyboardType: TextInputType.emailAddress,
                             controller: _emailController,
                             validator: (value) {
                               if (value!.isEmpty || !value.contains('@')) {
@@ -185,9 +241,9 @@ class _SignupScreenState extends State<SignupScreen>
                             height: 15,
                           ),
                           TextFormField(
-                            textInputAction: TextInputAction.next,
+                            textInputAction: TextInputAction.done,
                             onEditingComplete: () => FocusScope.of(context)
-                                .requestFocus(_passFocusNode),
+                                .requestFocus(_passwordFocusNode),
                             keyboardType: TextInputType.text,
                             controller: _passwordController,
                             validator: (value) {
@@ -200,20 +256,21 @@ class _SignupScreenState extends State<SignupScreen>
                             style: const TextStyle(color: Colors.white),
                             decoration: InputDecoration(
                               suffixIcon: GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      _obscureText = !_obscureText;
-                                    });
-                                  },
-                                  child: _obscureText
-                                      ? const Icon(
-                                          Icons.visibility,
-                                          color: Colors.white,
-                                        )
-                                      : const Icon(
-                                          Icons.visibility_off,
-                                          color: Colors.white,
-                                        )),
+                                onTap: () {
+                                  setState(() {
+                                    _obscureText = !_obscureText;
+                                  });
+                                },
+                                child: _obscureText
+                                    ? const Icon(
+                                        Icons.visibility,
+                                        color: Colors.white,
+                                      )
+                                    : const Icon(
+                                        Icons.visibility_off,
+                                        color: Colors.white,
+                                      ),
+                              ),
                               labelText: "Password",
                               labelStyle: const TextStyle(color: Colors.white),
                               enabledBorder: const OutlineInputBorder(
@@ -227,19 +284,82 @@ class _SignupScreenState extends State<SignupScreen>
                           const SizedBox(
                             height: 15,
                           ),
-                          SizedBox(
-                            width: MediaQuery.of(context).size.width * 0.5,
-                            child: ElevatedButton(
-                              onPressed: _submitFormSignin,
-                              child: const Text(
-                                "SignUp",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 20,
-                                ),
-                              ),
+                          TextFormField(
+                            textInputAction: TextInputAction.done,
+                            onEditingComplete: () => FocusScope.of(context)
+                                .requestFocus(_phoneNumberFocusNode),
+                            keyboardType: TextInputType.phone,
+                            controller: _phoneNumberController,
+                            validator: (value) {
+                              if (value!.isEmpty) {
+                                return "This Field is missing";
+                              }
+                              return null;
+                            },
+                            style: const TextStyle(color: Colors.white),
+                            decoration: const InputDecoration(
+                              labelText: "Phone Number",
+                              labelStyle: TextStyle(color: Colors.white),
+                              enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.white)),
+                              focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.green)),
+                              errorBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.red)),
                             ),
                           ),
+                          const SizedBox(
+                            height: 15,
+                          ),
+                          TextFormField(
+                            textInputAction: TextInputAction.done,
+                            onEditingComplete: () => FocusScope.of(context)
+                                .requestFocus(_companyAddressFocusNode),
+                            keyboardType: TextInputType.text,
+                            controller: _companyAddressController,
+                            validator: (value) {
+                              if (value!.isEmpty) {
+                                return "This Field is missing";
+                              }
+                              return null;
+                            },
+                            style: const TextStyle(color: Colors.white),
+                            decoration: const InputDecoration(
+                              labelText: "Company Address",
+                              labelStyle: TextStyle(color: Colors.white),
+                              enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.white)),
+                              focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.green)),
+                              errorBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.red)),
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 15,
+                          ),
+                          _isLoading
+                              ? const Center(
+                                  child: SizedBox(
+                                    height: 70,
+                                    width: 70,
+                                    child: CircularProgressIndicator(),
+                                  ),
+                                )
+                              : SizedBox(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.5,
+                                  child: ElevatedButton(
+                                    onPressed: _submitFormSignin,
+                                    child: const Text(
+                                      "SignUp",
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 20,
+                                      ),
+                                    ),
+                                  ),
+                                ),
                           const SizedBox(
                             height: 40,
                           ),
@@ -247,7 +367,7 @@ class _SignupScreenState extends State<SignupScreen>
                             child: RichText(
                               text: TextSpan(children: [
                                 const TextSpan(
-                                  text: "Have an account?Go To",
+                                  text: "Have an account? Go To",
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,

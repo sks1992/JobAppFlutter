@@ -26,7 +26,8 @@ class _LoginScreenState extends State<LoginScreen>
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final _loginFormKey = GlobalKey<FormState>();
-  final FocusNode _passFocusNode = FocusNode();
+  final FocusNode _emailFocusNode = FocusNode();
+  final FocusNode _passwordFocusNode = FocusNode();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _obscureText = false;
@@ -56,7 +57,8 @@ class _LoginScreenState extends State<LoginScreen>
     _emailController.dispose();
     _passwordController.dispose();
     _animationController.dispose();
-    _passFocusNode.dispose();
+    _passwordFocusNode.dispose();
+    _emailFocusNode.dispose();
     super.dispose();
   }
 
@@ -130,8 +132,8 @@ class _LoginScreenState extends State<LoginScreen>
                           TextFormField(
                             textInputAction: TextInputAction.next,
                             onEditingComplete: () => FocusScope.of(context)
-                                .requestFocus(_passFocusNode),
-                            keyboardType: TextInputType.text,
+                                .requestFocus(_emailFocusNode),
+                            keyboardType: TextInputType.emailAddress,
                             controller: _emailController,
                             validator: (value) {
                               if (value!.isEmpty || !value.contains('@')) {
@@ -157,7 +159,7 @@ class _LoginScreenState extends State<LoginScreen>
                           TextFormField(
                             textInputAction: TextInputAction.next,
                             onEditingComplete: () => FocusScope.of(context)
-                                .requestFocus(_passFocusNode),
+                                .requestFocus(_passwordFocusNode),
                             keyboardType: TextInputType.text,
                             controller: _passwordController,
                             validator: (value) {
