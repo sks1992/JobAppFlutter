@@ -1,7 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:job_clone_app_flutter/forget_password_screen/forget_password_screen.dart';
-import 'package:job_clone_app_flutter/services/global_variables.dart';
+import 'package:job_clone_app_flutter/services/constants.dart';
+
+import '../signup_screen/signup_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -20,11 +24,13 @@ class _LoginScreenState extends State<LoginScreen>
   // supports linear based animation and the value starts from 0.0 to 1.0
   late AnimationController _animationController;
 
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   final _loginFormKey = GlobalKey<FormState>();
   final FocusNode _passFocusNode = FocusNode();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _obscureText = false;
+  bool isLoading = false;
 
   @override
   void initState() {
@@ -51,6 +57,35 @@ class _LoginScreenState extends State<LoginScreen>
     _passwordController.dispose();
     _animationController.dispose();
     super.dispose();
+  }
+
+  void _submitFormLogin() async {
+    final isValid = _loginFormKey.currentState!.validate();
+    if (isValid) {
+      setState(() {
+        isLoading = true;
+      });
+
+      try {
+        await _auth.signInWithEmailAndPassword(
+          email: _emailController.text.trim().toLowerCase(),
+          password: _passwordController.text.trim(),
+        );
+        // ignore: use_build_context_synchronously
+        Navigator.canPop(context) ? Navigator.pop(context) : null;
+      } on FirebaseAuthException catch (error) {
+        setState(() {
+          isLoading = false;
+        });
+        GlobalMethod.showErrorDialog(
+          error: error.toString(),
+          context: context,
+        );
+      }
+    }
+    setState(() {
+      isLoading = true;
+    });
   }
 
   @override
@@ -168,7 +203,8 @@ class _LoginScreenState extends State<LoginScreen>
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) =>const ForgetPasswordScreen(),
+                                    builder: (context) =>
+                                        const ForgetPasswordScreen(),
                                   ),
                                 );
                               },
@@ -179,6 +215,63 @@ class _LoginScreenState extends State<LoginScreen>
                                     fontSize: 17,
                                     fontStyle: FontStyle.italic),
                               ),
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 15,
+                          ),
+                          SizedBox(
+                            width: MediaQuery.of(context).size.width * 0.5,
+                            child: ElevatedButton(
+                              onPressed: _submitFormLogin,
+                              child: const Text(
+                                "Login",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 40,
+                          ),
+                          Center(
+                            child: RichText(
+                              text: TextSpan(children: [
+                                const TextSpan(
+                                  text: "Do not have an account?",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                const TextSpan(
+                                  text: "   ",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                TextSpan(
+                                  recognizer: TapGestureRecognizer()
+                                    ..onTap = () => Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                const SignupScreen(),
+                                          ),
+                                        ),
+                                  text: "Signup",
+                                  style: const TextStyle(
+                                    color: Colors.cyan,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  )
+                                ),
+                              ]),
                             ),
                           )
                         ],
