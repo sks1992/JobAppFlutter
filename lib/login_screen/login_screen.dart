@@ -56,6 +56,7 @@ class _LoginScreenState extends State<LoginScreen>
     _emailController.dispose();
     _passwordController.dispose();
     _animationController.dispose();
+    _passFocusNode.dispose();
     super.dispose();
   }
 
@@ -256,21 +257,20 @@ class _LoginScreenState extends State<LoginScreen>
                                   ),
                                 ),
                                 TextSpan(
-                                  recognizer: TapGestureRecognizer()
-                                    ..onTap = () => Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                const SignupScreen(),
+                                    recognizer: TapGestureRecognizer()
+                                      ..onTap = () => Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const SignupScreen(),
+                                            ),
                                           ),
-                                        ),
-                                  text: "Signup",
-                                  style: const TextStyle(
-                                    color: Colors.cyan,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                  )
-                                ),
+                                    text: "Signup",
+                                    style: const TextStyle(
+                                      color: Colors.cyan,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                    )),
                               ]),
                             ),
                           )
