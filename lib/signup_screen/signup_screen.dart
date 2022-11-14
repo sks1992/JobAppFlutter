@@ -1,11 +1,16 @@
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:image_cropper/image_cropper.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:job_clone_app_flutter/login_screen/login_screen.dart';
-import 'package:job_clone_app_flutter/services/constants.dart';
+
+import '../util/constants.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({Key? key}) : super(key: key);
@@ -43,6 +48,7 @@ class _SignupScreenState extends State<SignupScreen>
 
   bool _obscureText = false;
   bool _isLoading = false;
+  String? imageUrl;
 
   @override
   void initState() {
@@ -81,36 +87,128 @@ class _SignupScreenState extends State<SignupScreen>
     super.dispose();
   }
 
-  void _submitFormSignin() async {
+  void _getImages(ImageSource source) async {
+    XFile? pickedFile = await ImagePicker().pickImage(source: source);
+    _cropImage(pickedFile!.path);
+  }
+
+  void _cropImage(String filePath) async {
+    CroppedFile? croppedImage = await ImageCropper().cropImage(
+      sourcePath: filePath,
+      maxHeight: 1080,
+      maxWidth: 1080,
+    );
+
+    if (croppedImage != null) {
+      setState(() {
+        imageFile = File(croppedImage.path);
+      });
+    }
+  }
+
+  void _showImageDialog() async {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text("Please choose a option"),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                InkWell(
+                  onTap: () {
+                    _getImages(ImageSource.camera);
+                    Navigator.pop(context);
+                  },
+                  child: Row(
+                    children: const [
+                      Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Icon(
+                          Icons.camera,
+                          color: Colors.purple,
+                        ),
+                      ),
+                      Text(
+                        "Camera",
+                        style: TextStyle(color: Colors.purple),
+                      )
+                    ],
+                  ),
+                ),
+                InkWell(
+                  onTap: () {
+                    _getImages(ImageSource.gallery);
+                    Navigator.pop(context);
+                  },
+                  child: Row(
+                    children: const [
+                      Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Icon(
+                          Icons.image,
+                          color: Colors.purple,
+                        ),
+                      ),
+                      Text(
+                        "Gallery",
+                        style: TextStyle(color: Colors.purple),
+                      )
+                    ],
+                  ),
+                )
+              ],
+            ),
+          );
+        });
+  }
+
+  void _submitFormOnSignUp() async {
     final isValid = _signupFormKey.currentState!.validate();
     if (isValid) {
+      if (imageFile == null) {
+        GlobalMethod.showErrorDialog(
+          error: "Please Pick am Image",
+          context: context,
+        );
+        return;
+      }
       setState(() {
         _isLoading = true;
       });
 
       try {
-        await _auth.signInWithEmailAndPassword(
+        await _auth.createUserWithEmailAndPassword(
           email: _emailController.text.trim().toLowerCase(),
           password: _passwordController.text.trim(),
         );
-        // ignore: use_build_context_synchronously
+
+        final User? user = _auth.currentUser;
+        final uid = user!.uid;
+        final ref =
+            FirebaseStorage.instance.ref().child("userImage").child("$uid.jpg");
+        await ref.putFile(imageFile!);
+        imageUrl = await ref.getDownloadURL();
+
+        FirebaseFirestore.instance.collection("users").doc(uid).set({
+          "id": uid,
+          "name": _nameController.text.trim(),
+          "email": _emailController.text.trim(),
+          "userImage": imageUrl,
+          "phoneNumber": _phoneNumberController.text.trim(),
+          "location": _companyAddressController.text.trim(),
+          "createdAt": Timestamp.now(),
+        });
         Navigator.canPop(context) ? Navigator.pop(context) : null;
-      } on FirebaseAuthException catch (error) {
+      } catch (error) {
         setState(() {
           _isLoading = false;
         });
-        GlobalMethod.showErrorDialog(
-          error: error.toString(),
-          context: context,
-        );
+        GlobalMethod.showErrorDialog(error: error.toString(), context: context);
       }
     }
-  }
-
-  void _showImageDialog() async {
-
-    showDialog(context: context, builder: (context){
-      return AlertDialog();
+    setState(() {
+      _isLoading = false;
     });
   }
 
@@ -142,20 +240,13 @@ class _SignupScreenState extends State<SignupScreen>
                 ),
                 child: ListView(
                   children: [
-                    // Padding(
-                    //   padding: const EdgeInsets.only(left: 80, right: 80),
-                    //   child: Image.asset("assets/images/login.png"),
-                    // ),
-                    // const SizedBox(
-                    //   height: 15,
-                    // ),
                     Form(
                       key: _signupFormKey,
                       child: Column(
                         children: [
                           GestureDetector(
                             onTap: () {
-                              //create showImageDialog
+                              _showImageDialog();
                             },
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
@@ -350,7 +441,7 @@ class _SignupScreenState extends State<SignupScreen>
                                   width:
                                       MediaQuery.of(context).size.width * 0.5,
                                   child: ElevatedButton(
-                                    onPressed: _submitFormSignin,
+                                    onPressed: _submitFormOnSignUp,
                                     child: const Text(
                                       "SignUp",
                                       style: TextStyle(

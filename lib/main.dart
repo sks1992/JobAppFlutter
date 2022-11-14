@@ -1,6 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:job_clone_app_flutter/signup_screen/signup_screen.dart';
 
 import 'login_screen/login_screen.dart';
 
@@ -20,13 +19,12 @@ class MyApp extends StatelessWidget {
       future: _initialized,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return  MaterialApp(
+          return MaterialApp(
             debugShowCheckedModeBanner: false,
             theme: ThemeData(
                 scaffoldBackgroundColor: Colors.black,
-                primarySwatch: Colors.blue
-            ),
-            home:const Scaffold(
+                primarySwatch: Colors.blue),
+            home: const Scaffold(
               body: Center(
                 child: Text(
                   "JobApp is being initialized",
@@ -39,12 +37,11 @@ class MyApp extends StatelessWidget {
             ),
           );
         } else if (snapshot.hasError) {
-          return  MaterialApp(
+          return MaterialApp(
             debugShowCheckedModeBanner: false,
             theme: ThemeData(
-              scaffoldBackgroundColor: Colors.black,
-              primarySwatch: Colors.blue
-            ),
+                scaffoldBackgroundColor: Colors.black,
+                primarySwatch: Colors.blue),
             home: const Scaffold(
               body: Center(
                 child: Text(
@@ -58,14 +55,12 @@ class MyApp extends StatelessWidget {
             ),
           );
         }
-        return  MaterialApp(
-          debugShowCheckedModeBanner: false,
-          theme: ThemeData(
-              scaffoldBackgroundColor: Colors.black,
-              primarySwatch: Colors.blue
-          ),
-          home:const SignupScreen()
-        );
+        return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            theme: ThemeData(
+                scaffoldBackgroundColor: Colors.black,
+                primarySwatch: Colors.blue),
+            home: const LoginScreen());
       },
     );
   }

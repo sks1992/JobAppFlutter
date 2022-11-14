@@ -3,9 +3,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:job_clone_app_flutter/forget_password_screen/forget_password_screen.dart';
-import 'package:job_clone_app_flutter/services/constants.dart';
 
 import '../signup_screen/signup_screen.dart';
+import '../util/constants.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
