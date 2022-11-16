@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:job_clone_app_flutter/search/search_job.dart';
 
@@ -13,7 +12,6 @@ class JobsScreen extends StatefulWidget {
 }
 
 class _JobsScreenState extends State<JobsScreen> {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
   String? jobCategoryFilter;
 
   void _showTextCategoryDialog({required Size size}) {
