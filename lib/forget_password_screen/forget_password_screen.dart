@@ -1,6 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:job_clone_app_flutter/login_screen/login_screen.dart';
 
 import '../util/constants.dart';
 
@@ -44,6 +46,22 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen>
           });
     _animationController.forward();
     super.initState();
+  }
+
+  void _forgetSubmitForm() async {
+    try {
+      await _auth.sendPasswordResetEmail(
+          email: _forgetPasswordController.text.trim());
+      // ignore: use_build_context_synchronously
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const LoginScreen(),
+        ),
+      );
+    } catch (error) {
+      Fluttertoast.showToast(msg: error.toString());
+    }
   }
 
   @override
@@ -121,7 +139,7 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen>
                   height: 16,
                 ),
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: _forgetSubmitForm,
                   child: const Text(
                     "Reset Password",
                     style: TextStyle(

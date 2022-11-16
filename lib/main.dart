@@ -1,7 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-
-import 'login_screen/login_screen.dart';
+import 'package:job_clone_app_flutter/user_state.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -60,7 +59,7 @@ class MyApp extends StatelessWidget {
             theme: ThemeData(
                 scaffoldBackgroundColor: Colors.black,
                 primarySwatch: Colors.blue),
-            home: const LoginScreen());
+            home: const UserState());
       },
     );
   }

@@ -2,6 +2,22 @@ import 'package:flutter/material.dart';
 
 String loginUrlImage = "https://eskipaper.com/images/building-wallpaper-11.jpg";
 
+List<String> jobCategoryList =[
+  "Architecture and Construction",
+  "Education and Training",
+  "Development -Programming",
+  "Business",
+  "Information Technology",
+  "Human Resources",
+  "Marketing",
+  "Design",
+  "Accounting",
+];
+
+String? name="";
+String? userImage="";
+String? location="";
+
 class GlobalMethod {
   static void showErrorDialog({
     required String error,
