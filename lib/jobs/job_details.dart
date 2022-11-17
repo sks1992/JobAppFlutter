@@ -189,9 +189,13 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                  const SizedBox(height: 5,),
+                                  const SizedBox(
+                                    height: 5,
+                                  ),
                                   Text(
-                                    locationCompany == null ? "" : locationCompany!,
+                                    locationCompany == null
+                                        ? ""
+                                        : locationCompany!,
                                     style: const TextStyle(
                                       color: Colors.white,
                                       fontSize: 16,
