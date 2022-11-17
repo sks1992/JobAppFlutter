@@ -141,16 +141,68 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                       children: [
                         Padding(
                           padding: const EdgeInsets.only(left: 4),
-                          child: Text(
-                            jobTitle == null ? "" : jobTitle!,
-                            maxLines: 3,
-                            style:const TextStyle(
-                              color: Colors.white,
-                              fontSize: 30,
-                              fontWeight: FontWeight.bold,
+                          child: Expanded(
+                            child: Text(
+                              jobTitle == null ? "" : jobTitle!,
+                              maxLines: 3,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 30,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                         ),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Container(
+                              height: 60,
+                              width: 60,
+                              decoration: BoxDecoration(
+                                border:
+                                    Border.all(width: 3, color: Colors.grey),
+                                shape: BoxShape.rectangle,
+                                image: DecorationImage(
+                                  image: NetworkImage(
+                                    userImageUrl == null
+                                        ? "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8YXZhdGFyfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=500&q=60"
+                                        : userImageUrl!,
+                                  ),
+                                  fit: BoxFit.fill,
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 10),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    authorName == null ? "" : authorName!,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 5,),
+                                  Text(
+                                    locationCompany == null ? "" : locationCompany!,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        )
                       ],
                     ),
                   ),
