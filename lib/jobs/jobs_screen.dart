@@ -1,5 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:job_clone_app_flutter/search/search_job.dart';
+import 'package:job_clone_app_flutter/widgets/job_widget.dart';
 
 import '../util/constants.dart';
 import '../widgets/bottom_navigation_bar.dart';
@@ -157,7 +159,52 @@ class _JobsScreenState extends State<JobsScreen> {
             ),
           ),
         ),
-        body: Container(),
+        body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+          stream: FirebaseFirestore.instance
+              .collection("jobs")
+              .where('jobCategory', isEqualTo: jobCategoryFilter)
+              .where('recruitment', isEqualTo: true)
+              .orderBy('createdAt', descending: false)
+              .snapshots(),
+          builder: (BuildContext context, AsyncSnapshot snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            } else if (snapshot.connectionState == ConnectionState.active) {
+              if (snapshot.data?.docs.isNotEmpty == true) {
+                return ListView.builder(
+                    itemCount: snapshot.data?.docs.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return JobWidget(
+                        jobTitle: snapshot.data?.docs[index]['jobTitle'] ?? "",
+                        jobDescription: snapshot.data?.docs[index]
+                            ['jobDescription'] ?? "",
+                        jobCategory: snapshot.data?.docs[index]
+                            ['jobCategory'] ?? "",
+                        jobId: snapshot.data?.docs[index]['jobId'] ?? "",
+                        uploadedBy: snapshot.data?.docs[index]['uploadedBy'] ?? "",
+                        userImage: snapshot.data?.docs[index]['userImage'] ?? "",
+                        name: snapshot.data?.docs[index]['name'] ?? "",
+                        recruitment: snapshot.data?.docs[index]['recruitment']?? false,
+                        email: snapshot.data?.docs[index]['email'] ?? "",
+                        location: snapshot.data?.docs[index]['location'] ?? "",
+                      );
+                    });
+              } else {
+                return const Center(
+                  child: Text("There is No Jobs"),
+                );
+              }
+            }
+            return const Center(
+              child: Text(
+                "Something went wrong",
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
+              ),
+            );
+          },
+        ),
       ),
     );
   }

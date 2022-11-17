@@ -65,6 +65,7 @@ class _UploadJobScreenState extends State<UploadJobScreen> {
           fct();
         },
         child: TextFormField(
+          textInputAction: TextInputAction.done,
           controller: controller,
           validator: (value) {
             if (value!.isEmpty) {
@@ -200,7 +201,7 @@ class _UploadJobScreenState extends State<UploadJobScreen> {
       try {
         await FirebaseFirestore.instance.collection("jobs").doc(jobId).set({
           'jobId': jobId,
-          'uploadedId': _uid,
+          'uploadedBy': _uid,
           'email': user.email,
           'jobTitle': _jobTitleController.text,
           'jobDescription': _jobDescriptionController.text,
@@ -242,6 +243,25 @@ class _UploadJobScreenState extends State<UploadJobScreen> {
     } else {
       print("Its not valid");
     }
+  }
+
+  void getMyData() async {
+    final DocumentSnapshot userDoc = await FirebaseFirestore.instance
+        .collection("users")
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .get();
+
+    setState(() {
+      name = userDoc.get("name");
+      userImage = userDoc.get("userImage");
+      location = userDoc.get("location");
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getMyData();
   }
 
   @override
