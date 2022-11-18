@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:job_clone_app_flutter/jobs/jobs_screen.dart';
 import 'package:job_clone_app_flutter/util/constants.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 class JobDetailScreen extends StatefulWidget {
   const JobDetailScreen(
@@ -96,6 +97,28 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
         ),
       ],
     );
+  }
+
+  void applyForJob() {
+    final Uri params = Uri(
+      scheme: "mailto",
+      path: emailCompany,
+      query:
+          'subject applying for $jobTitle&body=Hello, please attach Resume/ CV file',
+    );
+
+    final url = params.toString();
+    launchUrlString(url);
+    addNewApplicants();
+  }
+
+  void addNewApplicants() async {
+    var docRef =
+        FirebaseFirestore.instance.collection("jobs").doc(widget.jobId);
+
+    docRef.update({
+      'applicants' : applicants! + 1,
+    });
   }
 
   @override
@@ -421,7 +444,9 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                         ),
                         Center(
                           child: ElevatedButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              applyForJob();
+                            },
                             child: const Text(
                               "Easy Apply now",
                               style: TextStyle(
@@ -453,7 +478,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                           ],
                         ),
                         const SizedBox(
-                          height:12,
+                          height: 12,
                         ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
