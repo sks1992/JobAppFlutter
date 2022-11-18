@@ -173,7 +173,7 @@ class _UploadJobScreenState extends State<UploadJobScreen> {
         _jobDeadlineDateController.text =
             '${pickedDateTime!.day} - ${pickedDateTime!.month} - ${pickedDateTime!.year}';
 
-        deadlineDateTimeStamp = Timestamp.fromMicrosecondsSinceEpoch(
+        deadlineDateTimeStamp = Timestamp.fromMillisecondsSinceEpoch(
             pickedDateTime!.millisecondsSinceEpoch);
       });
     }

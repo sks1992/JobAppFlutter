@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:job_clone_app_flutter/jobs/jobs_screen.dart';
+import 'package:job_clone_app_flutter/util/constants.dart';
 
 class JobDetailScreen extends StatefulWidget {
   const JobDetailScreen(
@@ -15,6 +17,8 @@ class JobDetailScreen extends StatefulWidget {
 }
 
 class _JobDetailScreenState extends State<JobDetailScreen> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
   String? authorName;
   String? userImageUrl;
   String? jobCategory;
@@ -75,6 +79,23 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
   void initState() {
     super.initState();
     getJobData();
+  }
+
+  Widget dividerWidget() {
+    return Column(
+      children: const [
+        SizedBox(
+          height: 10,
+        ),
+        Divider(
+          thickness: 1,
+          color: Colors.grey,
+        ),
+        SizedBox(
+          height: 10,
+        ),
+      ],
+    );
   }
 
   @override
@@ -141,15 +162,13 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                       children: [
                         Padding(
                           padding: const EdgeInsets.only(left: 4),
-                          child: Expanded(
-                            child: Text(
-                              jobTitle == null ? "" : jobTitle!,
-                              maxLines: 3,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 30,
-                                fontWeight: FontWeight.bold,
-                              ),
+                          child: Text(
+                            jobTitle == null ? "" : jobTitle!,
+                            maxLines: 3,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 30,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
                         ),
@@ -206,7 +225,257 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                               ),
                             ),
                           ],
-                        )
+                        ),
+                        dividerWidget(),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              applicants.toString(),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                              ),
+                            ),
+                            const SizedBox(
+                              width: 6,
+                            ),
+                            const Text(
+                              "Applicants",
+                              style: TextStyle(
+                                color: Colors.white,
+                              ),
+                            ),
+                            const SizedBox(
+                              width: 10,
+                            ),
+                            const Icon(
+                              Icons.how_to_reg_sharp,
+                              color: Colors.grey,
+                            )
+                          ],
+                        ),
+                        FirebaseAuth.instance.currentUser!.uid !=
+                                widget.uploadedBy
+                            ? Container()
+                            : Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  dividerWidget(),
+                                  const Text(
+                                    "Recruitment",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18,
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    height: 5,
+                                  ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      TextButton(
+                                        onPressed: () {
+                                          User? user = _auth.currentUser!;
+                                          final _uid = user.uid;
+                                          if (_uid == widget.uploadedBy) {
+                                            try {
+                                              FirebaseFirestore.instance
+                                                  .collection("jobs")
+                                                  .doc(widget.jobId)
+                                                  .update(
+                                                      {'recruitment': true});
+                                            } catch (error) {
+                                              GlobalMethod.showErrorDialog(
+                                                error:
+                                                    "Action Con not be performed",
+                                                context: context,
+                                              );
+                                            }
+                                          } else {
+                                            GlobalMethod.showErrorDialog(
+                                              error:
+                                                  "you cannot perform this action",
+                                              context: context,
+                                            );
+                                          }
+                                          getJobData();
+                                        },
+                                        child: const Text(
+                                          "ON",
+                                          style: TextStyle(
+                                            fontStyle: FontStyle.italic,
+                                            color: Colors.black,
+                                            fontSize: 18,
+                                          ),
+                                        ),
+                                      ),
+                                      Opacity(
+                                        opacity: recruitment == true ? 1 : 0,
+                                        child: const Icon(
+                                          Icons.check_box,
+                                          color: Colors.green,
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        width: 40,
+                                      ),
+                                      TextButton(
+                                        onPressed: () {
+                                          User? user = _auth.currentUser!;
+                                          final _uid = user.uid;
+                                          if (_uid == widget.uploadedBy) {
+                                            try {
+                                              FirebaseFirestore.instance
+                                                  .collection("jobs")
+                                                  .doc(widget.jobId)
+                                                  .update(
+                                                      {'recruitment': false});
+                                            } catch (error) {
+                                              GlobalMethod.showErrorDialog(
+                                                error:
+                                                    "Action Con not be performed",
+                                                context: context,
+                                              );
+                                            }
+                                          } else {
+                                            GlobalMethod.showErrorDialog(
+                                              error:
+                                                  "you cannot perform this action",
+                                              context: context,
+                                            );
+                                          }
+                                          getJobData();
+                                        },
+                                        child: const Text(
+                                          "OFF",
+                                          style: TextStyle(
+                                            fontStyle: FontStyle.italic,
+                                            color: Colors.black,
+                                            fontSize: 18,
+                                          ),
+                                        ),
+                                      ),
+                                      Opacity(
+                                        opacity: recruitment == false ? 1 : 0,
+                                        child: const Icon(
+                                          Icons.check_box,
+                                          color: Colors.red,
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                ],
+                              ),
+                        dividerWidget(),
+                        const Text(
+                          "job description",
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        Text(
+                          jobDescription == null ? "" : jobDescription!,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey,
+                          ),
+                          textAlign: TextAlign.justify,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(4.0),
+                child: Card(
+                  color: Colors.black54,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Center(
+                          child: Text(
+                            isDeadlinesAvailable!
+                                ? "Activity Recruiting. Send CV/Resume"
+                                : "Deadline Past away.",
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: isDeadlinesAvailable!
+                                  ? Colors.green
+                                  : Colors.red,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 6,
+                        ),
+                        Center(
+                          child: ElevatedButton(
+                            onPressed: () {},
+                            child: const Text(
+                              "Easy Apply now",
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                        dividerWidget(),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              "Uploaded on:",
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.white,
+                              ),
+                            ),
+                            Text(
+                              postedDate == null ? "" : postedDate!,
+                              style: const TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(
+                          height:12,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              "Deadline Date: ",
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.white,
+                              ),
+                            ),
+                            Text(
+                              deadlineDate == null ? "" : deadlineDate!,
+                              style: const TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                        dividerWidget()
                       ],
                     ),
                   ),
