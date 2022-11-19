@@ -44,7 +44,6 @@ class _JobsScreenState extends State<JobsScreen> {
                         Navigator.canPop(context)
                             ? Navigator.pop(context)
                             : null;
-                        print("jobCategoryList:: ${jobCategoryList[index]}");
                       },
                       child: Row(
                         children: [
@@ -94,6 +93,13 @@ class _JobsScreenState extends State<JobsScreen> {
             ],
           );
         });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    GlobalMethod globalMethod = GlobalMethod();
+    globalMethod.getMyData();
   }
 
   @override
@@ -178,15 +184,18 @@ class _JobsScreenState extends State<JobsScreen> {
                     itemBuilder: (BuildContext context, int index) {
                       return JobWidget(
                         jobTitle: snapshot.data?.docs[index]['jobTitle'] ?? "",
-                        jobDescription: snapshot.data?.docs[index]
-                            ['jobDescription'] ?? "",
-                        jobCategory: snapshot.data?.docs[index]
-                            ['jobCategory'] ?? "",
+                        jobDescription:
+                            snapshot.data?.docs[index]['jobDescription'] ?? "",
+                        jobCategory:
+                            snapshot.data?.docs[index]['jobCategory'] ?? "",
                         jobId: snapshot.data?.docs[index]['jobId'] ?? "",
-                        uploadedBy: snapshot.data?.docs[index]['uploadedBy'] ?? "",
-                        userImage: snapshot.data?.docs[index]['userImage'] ?? "",
+                        uploadedBy:
+                            snapshot.data?.docs[index]['uploadedBy'] ?? "",
+                        userImage:
+                            snapshot.data?.docs[index]['userImage'] ?? "",
                         name: snapshot.data?.docs[index]['name'] ?? "",
-                        recruitment: snapshot.data?.docs[index]['recruitment']?? false,
+                        recruitment:
+                            snapshot.data?.docs[index]['recruitment'] ?? false,
                         email: snapshot.data?.docs[index]['email'] ?? "",
                         location: snapshot.data?.docs[index]['location'] ?? "",
                       );

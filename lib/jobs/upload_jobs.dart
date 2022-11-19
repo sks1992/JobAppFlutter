@@ -245,25 +245,6 @@ class _UploadJobScreenState extends State<UploadJobScreen> {
     }
   }
 
-  void getMyData() async {
-    final DocumentSnapshot userDoc = await FirebaseFirestore.instance
-        .collection("users")
-        .doc(FirebaseAuth.instance.currentUser!.uid)
-        .get();
-
-    setState(() {
-      name = userDoc.get("name");
-      userImage = userDoc.get("userImage");
-      location = userDoc.get("location");
-    });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    getMyData();
-  }
-
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
