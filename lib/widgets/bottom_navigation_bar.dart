@@ -79,7 +79,6 @@ class BottomNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CurvedNavigationBar(
-
       color: Colors.deepOrange.shade400,
       backgroundColor: Colors.blueAccent,
       buttonBackgroundColor: Colors.deepOrange.shade300,
@@ -142,10 +141,15 @@ class BottomNavBar extends StatelessWidget {
           );
         }
         if (index == 3) {
+          final FirebaseAuth auth = FirebaseAuth.instance;
+          final User? user = auth.currentUser;
+          final String uid = user!.uid;
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (context) => const ProfileCompanyScreen(),
+              builder: (context) => ProfileCompanyScreen(
+                userId: uid,
+              ),
             ),
           );
         }

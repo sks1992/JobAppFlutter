@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:job_clone_app_flutter/jobs/jobs_screen.dart';
 import 'package:job_clone_app_flutter/util/constants.dart';
+import 'package:job_clone_app_flutter/widgets/comments_widgets.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:uuid/uuid.dart';
 
@@ -670,7 +671,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                                     IconButton(
                                       onPressed: () {
                                         setState(() {
-                                          showComment = false;
+                                          showComment = true;
                                         });
                                       },
                                       icon: const Icon(
@@ -682,6 +683,56 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                                   ],
                                 ),
                         ),
+                        showComment == false
+                            ? Container()
+                            : Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: FutureBuilder<DocumentSnapshot>(
+                                  future: FirebaseFirestore.instance
+                                      .collection("jobs")
+                                      .doc(widget.jobId)
+                                      .get(),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.connectionState ==
+                                        ConnectionState.waiting) {
+                                      return const Center(
+                                        child: CircularProgressIndicator(),
+                                      );
+                                    } else {
+                                      if (snapshot.data == null) {
+                                        return const Center(
+                                          child:
+                                              Text("No Comment for this post"),
+                                        );
+                                      }
+                                    }
+                                    return ListView.separated(
+                                      shrinkWrap: true,
+                                      physics:
+                                          const NeverScrollableScrollPhysics(),
+                                      itemBuilder: (context, index) {
+                                        var data = snapshot.data!['jobComments']
+                                            [index];
+                                        return CommentWidget(
+                                          commentId: data['commentId'],
+                                          commentName: data['name'],
+                                          commentBody: data['commentBody'],
+                                          commentImageUrl: data['userImageUrl'],
+                                          commenterId: data['userId'],
+                                        );
+                                      },
+                                      separatorBuilder: (context, index) {
+                                        return const Divider(
+                                          thickness: 1,
+                                          color: Colors.grey,
+                                        );
+                                      },
+                                      itemCount:
+                                          snapshot.data!['jobComments'].length,
+                                    );
+                                  },
+                                ),
+                              ),
                       ],
                     ),
                   ),
