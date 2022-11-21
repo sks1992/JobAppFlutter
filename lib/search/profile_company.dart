@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:job_clone_app_flutter/user_state.dart';
 
 import '../widgets/bottom_navigation_bar.dart';
 
@@ -69,8 +70,32 @@ class _ProfileCompanyScreenState extends State<ProfileCompanyScreen> {
     getUserData();
   }
 
+  Widget userInfo({
+    required IconData icon,
+    required String content,
+  }) {
+    return Row(
+      children: [
+        Icon(
+          icon,
+          color: Colors.white,
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          child: Text(
+            content,
+            style: const TextStyle(
+              color: Colors.white,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -151,10 +176,82 @@ class _ProfileCompanyScreenState extends State<ProfileCompanyScreen> {
                                       ),
                                     ),
                                   ),
+                                  const SizedBox(height: 15),
+                                  Padding(
+                                    padding: const EdgeInsets.all(10.0),
+                                    child: userInfo(
+                                      icon: Icons.email,
+                                      content: email,
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(10.0),
+                                    child: userInfo(
+                                      icon: Icons.phone,
+                                      content: phoneNumber,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 20),
+                                  const Divider(
+                                    thickness: 1,
+                                    color: Colors.white,
+                                  ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      ElevatedButton(
+                                        onPressed: () {
+                                          _auth.signOut();
+                                          Navigator.pushReplacement(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (_) => const UserState(),
+                                            ),
+                                          );
+                                        },
+                                        child: Row(
+                                          children: const [
+                                            Text(
+                                              "Logout",
+                                              style: TextStyle(fontSize: 20),
+                                            ),
+                                            SizedBox(width: 10),
+                                            Icon(Icons.logout)
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  )
                                 ],
                               ),
                             ),
-                          )
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Container(
+                                width: size.width * 0.28,
+                                height: size.width * 0.28,
+                                decoration: BoxDecoration(
+                                  color: Colors.red,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    width: 8,
+                                    color: Theme.of(context)
+                                        .scaffoldBackgroundColor,
+                                  ),
+                                  image: DecorationImage(
+                                    image: NetworkImage(
+                                      imageUrl ??
+                                          "https://w7.pngwing.com/pngs/340/946/png-transparent-avatar-user-computer-icons-software-developer-avatar-child-face-heroes.png",
+                                    ),
+                                    fit: BoxFit.fill,
+                                  ),
+                                ),
+                                child: Container(),
+                              )
+                            ],
+                          ),
                         ],
                       ),
                     ),
